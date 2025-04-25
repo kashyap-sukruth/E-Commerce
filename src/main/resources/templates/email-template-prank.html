@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OTP Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            color: #0056b3;
+        }
+        .otp {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d9534f;
+            display: inline;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>OTP Verification</h2>
+        <p>Dear <span th:text="${name}">User</span>,</p>
+        <!-- <p>you are requested to verify the OTP Received to  . Please use the following One-Time Password (OTP) to complete the process:</p> -->
+        <p><span class="otp" th:text="${otp}"></span> is your OTP for E-com transaction for INR 2383.67 at Zeptonow on card ending 7154 and is valid for 5 minutes. Never share this OTP with anyone.</p>
+        <p>For any assistance, please call our contact centre at 18004201199/ 18004251199 (Toll free), +91484 2630994/5 (for customers abroad).</p>
+      
+        <br>
+        <div class="footer">
+            <p>Please do not reply to this email. This is an automated message.</p>
+        </div>
+    </div>
+</body>
+</html>
