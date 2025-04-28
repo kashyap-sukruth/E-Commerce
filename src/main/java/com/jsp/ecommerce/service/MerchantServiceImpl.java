@@ -129,7 +129,7 @@ public class MerchantServiceImpl implements MerchantService {
 	}
 
 	@Override
-	public String addProduct(HttpSession session, @Valid ProductDto productDto, BindingResult result) {
+	public String addProduct(@Valid ProductDto productDto,BindingResult result,HttpSession session) {
 		Merchant merchant = (Merchant) session.getAttribute("merchant");
 
 		if (merchant != null) 

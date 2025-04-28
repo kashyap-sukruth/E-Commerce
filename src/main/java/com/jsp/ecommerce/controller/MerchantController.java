@@ -59,9 +59,9 @@ public class MerchantController
 	}
 	
 	@PostMapping("/add-product")
-	public String addProduct(HttpSession session,@Valid ProductDto productDto,BindingResult result)
+	public String addProduct(@Valid ProductDto productDto,BindingResult result,HttpSession session)
 	{
-		return merchantService.addProduct(session,productDto,result);
+		return merchantService.addProduct(productDto,result,session);
 	}
 	@GetMapping("/manage-products")
 	public String manageProducts(HttpSession session,Model model) {

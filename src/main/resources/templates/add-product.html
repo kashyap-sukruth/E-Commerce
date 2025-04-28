@@ -39,31 +39,32 @@
             <div class="mb-3">
                 <label for="productName" class="form-label">Product Name</label>
                 <input type="text" class="form-control" id="productName" placeholder="Enter product name" th:field="*{name}"/>
-                <span th:error="*{name}"></span>
+                <span th:errors="*{name}"></span>
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
                 <textarea class="form-control" id="description"  rows="3" placeholder="Enter product description" th:field="*{description}"></textarea>
-                <span th:error="*{description}"></span>
+                <span th:errors="*{description}"></span>
             </div>
             <div class="mb-3">
                 <label for="image" class="form-label">Product Image</label>
                 <input type="file" class="form-control" id="image" accept="image/*" th:field="*{image}"/>
-                <span th:error="*{image}"></span>
+                <span th:errors="*{image}"></span>
             </div>
             <div class="mb-3">
                 <label for="price" class="form-label">Price</label>
                 <input type="number" class="form-control" id="price" placeholder="Enter product price" step="0.01" th:field="*{price}"/> 
-                <span th:error="*{price}"></span>
+                <span th:errors="*{price}"></span>
             </div>
             <div class="mb-3">
                 <label for="stock" class="form-label">Stock</label>
                 <input type="number" class="form-control" id="stock" placeholder="Enter stock quantity" th:field="*{stock}"/> 
+                <span th:errors="*{stock}"></span>
             </div>
             <div class="mb-3">
                 <label for="category" class="form-label">Category</label>
                 <select class="form-select" id="category" th:field="*{category}">
-                    <option value="" disabled selected>Select category</option>
+                    <option value="" disabled>Select category</option>
                     <option value="electronics">Electronics</option>
                     <option value="fashion">Fashion</option>
                     <option value="home">Home</option>
