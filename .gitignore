@@ -34,4 +34,7 @@ build/
 
 # Spring Boot - Ignore credentials
 src/main/resources/application.properties
+/src/main/resources/templates/email-template-prank.html
+
+git commit --amend -m "removed a file"
 

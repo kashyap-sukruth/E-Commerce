@@ -1,5 +1,7 @@
 package com.jsp.ecommerce.controller;
 
+import java.security.PublicKey;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.jsp.ecommerce.dto.ProductDto;
 import com.jsp.ecommerce.dto.UserDto;
 import com.jsp.ecommerce.service.MerchantService;
 
@@ -48,5 +51,20 @@ public class MerchantController
 	{
 		return merchantService.loadHome(session);
 	}
-
+	
+	@GetMapping("/add-product")
+	public String loadAddProduct(ProductDto productDto,HttpSession httpSession,Model model)
+	{
+		return merchantService.loadAddProduct(httpSession,model,productDto);
+	}
+	
+	@PostMapping("/add-product")
+	public String addProduct(HttpSession session,@Valid ProductDto productDto,BindingResult result)
+	{
+		return merchantService.addProduct(session,productDto,result);
+	}
+	@GetMapping("/manage-products")
+	public String manageProducts(HttpSession session,Model model) {
+		return merchantService.manageProducts(session,model);
+	}
 }

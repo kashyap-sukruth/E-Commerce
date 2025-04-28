@@ -80,8 +80,11 @@ public class GeneralServiceimpl implements GeneralService
 
 	@Override
 	public String logout(HttpSession session) {
-		// TODO Auto-generated method stub
-		return null;
+		session.removeAttribute("admin");
+		session.removeAttribute("merchant");
+		session.removeAttribute("customer");
+		session.setAttribute("pass", "Logout Success");
+		return "redirect:/";
 	}
 
 }

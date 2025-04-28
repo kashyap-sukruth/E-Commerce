@@ -43,6 +43,10 @@ public class Product
 	@Enumerated(EnumType.STRING)
 	private Status status;
 	
+	@Column(nullable = false)
+	private Integer stock;
+	@Column(nullable = false)
+	private String category;
 	@UpdateTimestamp
 	private LocalDateTime createdAt;
 	

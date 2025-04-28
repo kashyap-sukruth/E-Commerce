@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #343a40;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2 class="form-title">Add New Product</h2>
+        <form action="/merchant/add-product" method="post" enctype="multipart/form-data"  th:object="${productDto}" autocomplete="on">
+            <div class="mb-3">
+                <label for="productName" class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="productName" placeholder="Enter product name" th:field="*{name}"/>
+                <span th:error="*{name}"></span>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description"  rows="3" placeholder="Enter product description" th:field="*{description}"></textarea>
+                <span th:error="*{description}"></span>
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">Product Image</label>
+                <input type="file" class="form-control" id="image" accept="image/*" th:field="*{image}"/>
+                <span th:error="*{image}"></span>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input type="number" class="form-control" id="price" placeholder="Enter product price" step="0.01" th:field="*{price}"/> 
+                <span th:error="*{price}"></span>
+            </div>
+            <div class="mb-3">
+                <label for="stock" class="form-label">Stock</label>
+                <input type="number" class="form-control" id="stock" placeholder="Enter stock quantity" th:field="*{stock}"/> 
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-select" id="category" th:field="*{category}">
+                    <option value="" disabled selected>Select category</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="home">Home</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="sports">Sports</option>
+                </select>
+                <span th:errors="*{category}"></span>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Add Product</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
