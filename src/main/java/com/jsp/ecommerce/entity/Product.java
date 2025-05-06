@@ -49,6 +49,7 @@ public class Product
 	private String category;
 	@UpdateTimestamp
 	private LocalDateTime createdAt;
+	private String reason;
 	
 	@ManyToOne
     private Merchant merchant;

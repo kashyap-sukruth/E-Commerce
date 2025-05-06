@@ -4,6 +4,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.jsp.ecommerce.dto.UserDto;
+import com.jsp.ecommerce.helper.Status;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -17,6 +18,8 @@ public interface CustomerService
 	public String sumbitOtp(int otp, HttpSession session);
 
 	public String loadHome(HttpSession session);
+
+	public String viewApprovedProducts(HttpSession session, Model model);
 
 
 

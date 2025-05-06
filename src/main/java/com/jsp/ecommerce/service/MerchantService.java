@@ -24,4 +24,11 @@ public interface MerchantService {
 	public String addProduct(@Valid ProductDto productDto,BindingResult result,HttpSession session);
 
 	public String manageProducts(HttpSession session, Model model);
+
+	public String loadExistingProduct(Long id, Model model, HttpSession session);
+
+	public String updateProduct( ProductDto productDto, BindingResult result, HttpSession session, Long id,
+			Model model);
+
+	public String deleteById(Long id, HttpSession session);
 }

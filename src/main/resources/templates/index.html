@@ -1,174 +1,653 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>E-Commerce</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> Kartzo–Your Cart, Reimagined</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #35e652;
+        --primary-dark: #cdcd1a;
+        --secondary: rgb(14, 141, 25);
+        --light: #f8f9fa;
+        --dark: #212529;
+        --success: #2ecc71;
+        --danger: #e74c3c;
+        --gray: #6c757d;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      * {
         margin: 0;
         padding: 0;
-    }
-    nav {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px 20px;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--light);
+        color: var(--dark);
+      }
+
+      .navbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-    }
-    nav .logo {
+        padding: 1rem 5%;
+        background-color: #ffffff;
+        box-shadow: var(--shadow);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .logo {
         display: flex;
         align-items: center;
-    }
-    nav .logo img {
+      }
+
+      .logo a {
+        text-decoration: none;
+        color: var(--dark);
+      }
+
+      .logo img {
         height: 40px;
         margin-right: 10px;
-    }
-    nav .logo span {
-        font-size: 20px;
-        font-weight: bold;
-    }
-    nav .buttons button {
-        margin-right: 10px;
-        padding: 5px 10px;
-        background-color: white;
-        color: #4CAF50;
+      }
+
+      .logo h1 {
+        font-size: 1.8rem;
+        color: var(--primary);
+        font-weight: 700;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 30px;
+      }
+
+      .nav-links a {
+        color: var(--dark);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .nav-links a:hover {
+        color: var(--primary);
+      }
+
+      .nav-buttons {
+        display: flex;
+        gap: 15px;
+      }
+
+      .nav-btn {
+        padding: 10px 20px;
         border: none;
         border-radius: 5px;
+        font-weight: 600;
         cursor: pointer;
-    }
-    nav .dropdown {
+        transition: var(--transition);
+      }
+
+      .login-btn {
+        background-color: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+      }
+
+      .login-btn:hover {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .register-btn {
+        background-color: var(--primary);
+        color: white;
         position: relative;
-    }
-    nav .dropdown-menu {
+      }
+
+      .register-btn:hover {
+        background-color: var(--primary-dark);
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-content {
         display: none;
         position: absolute;
         right: 0;
-        top: 30px;
-        background-color: white;
-        color: black;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    nav .dropdown-menu a {
+        background-color: #ffffff;
+        min-width: 220px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        z-index: 1;
+        overflow: hidden;
+        transition: var(--transition);
+      }
+
+      .dropdown:hover .dropdown-content {
         display: block;
-        padding: 10px;
+        animation: fadeIn 0.3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .dropdown-option {
+        padding: 12px 16px;
         text-decoration: none;
-        color: #4CAF50;
-    }
-    nav .dropdown-menu a:hover {
-        background-color: #f1f1f1;
-    }
-    .search-bar {
-        margin: 20px auto;
-        text-align: center;
-    }
-    .search-bar input {
-        width: 60%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        padding: 20px;
-    }
-    .product {
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 10px;
-        text-align: center;
-    }
-    .product img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 5px;
-    }
-    .product h3 {
-        font-size: 18px;
-        margin: 10px 0;
-    }
-    .product p {
-        color: #4CAF50;
-        font-weight: bold;
-    }
-    footer {
-        margin-top: 20px;
-        text-align: center;
-        padding: 10px;
-        background-color: #4CAF50;
+        display: block;
+        color: var(--dark);
+        transition: var(--transition);
+      }
+
+      .dropdown-option:hover {
+        background-color: #f1f5ff;
+        color: var(--primary);
+      }
+
+      .alert {
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        min-width: 300px;
+        max-width: 500px;
+        animation: slideDown 0.3s, fadeOut 0.5s 1.5s forwards;
+      }
+
+      .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-left: 4px solid var(--success);
+      }
+
+      .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid var(--danger);
+      }
+
+      .alert-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+      }
+
+      @keyframes slideDown {
+        from {
+          transform: translate(-50%, -20px);
+          opacity: 0;
+        }
+        to {
+          transform: translate(-50%, 0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+
+      .hero {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         color: white;
-    }
-</style>
-</head>
-<body>
-    <nav>
-        <div class="logo">
-            <img src="logo.png" alt="Logo">
-            <span>E-Commerce</span>
-        </div>
-        <div class="buttons">
-            <a href="/login"><button>Login</button></a>
-           <a href="/logout"> <button>Logout</button></a>
-        </div>
+        padding: 6rem 5%;
+        text-align: center;
+      }
+
+      .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 2.5rem;
+        opacity: 0.9;
+        line-height: 1.6;
+      }
+
+      .cta-btn {
+        padding: 15px 30px;
+        background-color: white;
+        color: var(--primary);
+        border: none;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .cta-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .features {
+        padding: 6rem 5%;
+        background-color: white;
+        text-align: center;
+      }
+
+      .section-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--dark);
+        font-weight: 700;
+      }
+
+      .section-subtitle {
+        color: var(--gray);
+        max-width: 700px;
+        margin: 0 auto 3rem;
+        font-size: 1.1rem;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .feature-card {
+        background-color: var(--light);
+        padding: 2.5rem 2rem;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .feature-icon {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--dark);
+      }
+
+      .feature-card p {
+        color: var(--gray);
+        line-height: 1.6;
+      }
+
+      .footer {
+        background-color: #1a1a1a;
+        color: white;
+        padding: 3rem 5% 1.5rem;
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .footer-logo {
+        display: flex;
+        align-items: center;
+      }
+
+      .footer-logo img {
+        height: 35px;
+        margin-right: 10px;
+      }
+
+      .footer-logo h2 {
+        font-size: 1.5rem;
+        color: white;
+      }
+
+      .social-icons {
+        display: flex;
+        gap: 15px;
+      }
+
+      .social-icons a {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+      }
+
+      .social-icons a:hover {
+        background-color: var(--primary);
+        transform: translateY(-3px);
+      }
+
+      .footer-bottom {
+        text-align: center;
+        padding-top: 1.5rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+      }
+
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--dark);
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      @media (max-width: 992px) {
+        .nav-links {
+          display: none;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .navbar {
+          padding: 1rem 3%;
+        }
+
+        .mobile-menu-btn {
+          display: block;
+        }
+
+        .nav-buttons {
+          display: none;
+        }
+
+        .logo h1 {
+          font-size: 1.5rem;
+        }
+
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .section-title {
+          font-size: 2rem;
+        }
+
+        .footer-content {
+          flex-direction: column;
+          gap: 20px;
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero p {
+          font-size: 1rem;
+        }
+
+        .alert {
+          min-width: 90%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="/">
+          <img height="70" width="70" src="/images/kartZologo-.png" alt="KartZoLogo" />
+        </a>
+        <a href="/"><h1>Kartzo</h1></a>
+      </div>
+
+
+      <div class="nav-buttons">
+        <a href="/login"><button class="nav-btn login-btn">Login</button></a>
         <div class="dropdown">
-            <button id="hamburger" style="background: none; border: none; font-size: 24px; cursor: pointer; color: white;">☰</button>
-            <div id="dropdown" class="dropdown-menu">
-                <a href="/admin/register">Admin</a>
-                <a href="/merchant/register">Merchant</a>
-                <a href="/customer/register">Customer</a>
-            </div>
+          <button class="nav-btn register-btn">Register</button>
+          <div class="dropdown-content">
+            <a href="/admin/register" class="dropdown-option">
+              <i class="fas fa-user-shield"></i> Admin Register
+            </a>
+            <a href="/merchant/register" class="dropdown-option">
+              <i class="fas fa-store"></i> Merchant Register
+            </a>
+            <a href="/customer/register" class="dropdown-option">
+              <i class="fas fa-user"></i> Customer Register
+            </a>
+          </div>
         </div>
+      </div>
     </nav>
 
-    <div class="search-bar">
-        <input type="text" placeholder="Search for products...">
+    <!-- Alert messages that will disappear after 2 seconds -->
+    <div th:if="${session.pass}" class="alert alert-success">
+      <i class="fas fa-check-circle alert-icon"></i>
+      <span th:text="${session.pass}"></span>
     </div>
-
-    <div class="product-grid">
-        <div class="product">
-            <img src="product1.jpg" alt="Product 1">
-            <h3>Product 1</h3>
-            <p>$10.00</p>
-        </div>
-        <div class="product">
-            <img src="product2.jpg" alt="Product 2">
-            <h3>Product 2</h3>
-            <p>$20.00</p>
-        </div>
-        <div class="product">
-            <img src="product3.jpg" alt="Product 3">
-            <h3>Product 3</h3>
-            <p>$30.00</p>
-        </div>
-        <div class="product">
-            <img src="product4.jpg" alt="Product 4">
-            <h3>Product 4</h3>
-            <p>$40.00</p>
-        </div>
+    <div th:if="${session.fail}" class="alert alert-danger">
+      <i class="fas fa-exclamation-circle alert-icon"></i>
+      <span th:text="${session.fail}"></span>
     </div>
+    <th:block th:text="${@messageRemover.remove()}"></th:block>
 
-    <footer>
-        &copy; 2023 E-Commerce. All rights reserved.
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Kartzo</h1>
+        <p>
+          Discover a world of products with unbeatable prices and exceptional
+          quality. Your one-stop destination for all your shopping needs.
+        </p>
+        <a href="/login"><button class="cta-btn">Shop Now <i class="fas fa-arrow-right"></i></button></a>
+      </div>
+    </section>
+
+    <section class="features">
+      <h2 class="section-title">Why Choose Us</h2>
+      <p class="section-subtitle">
+        We provide the best shopping experience with premium services tailored to your needs.
+      </p>
+            <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shipping-fast"></i>
+          </div>
+          <h3>Fast Delivery</h3>
+          <p>
+            Get your products delivered to your doorstep within 24-48 hours of
+            placing your order with our premium shipping partners.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3>Secure Payments</h3>
+          <p>
+            Our payment gateway ensures your transactions are safe and secure at
+            all times with end-to-end encryption technology.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-undo"></i>
+          </div>
+          <h3>Easy Returns</h3>
+          <p>
+            Not satisfied with your purchase? Return it within 30 days for a
+            full refund with our hassle-free return policy.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" style="background-color: var(--light);">
+      <h2 class="section-title">Our Products</h2>
+      <p class="section-subtitle">
+        Browse through our extensive collection of high-quality products
+      </p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-tshirt"></i>
+          </div>
+          <h3>Fashion</h3>
+          <p>
+            Discover the latest trends in clothing, footwear, and accessories for men, women, and children.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3>Electronics</h3>
+          <p>
+            Explore cutting-edge gadgets, smartphones, laptops, and home appliances from top brands.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-home"></i>
+          </div>
+          <h3>Home & Living</h3>
+          <p>
+            Transform your living space with our stylish furniture, decor items, and kitchen essentials.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-bottom">
+        <p>&copy; 2025 KartZo. All Rights Reserved.</p>
+      </div>
     </footer>
 
     <script>
-        const hamburger = document.getElementById('hamburger');
-        const dropdown = document.getElementById('dropdown');
-
-        hamburger.addEventListener('click', () => {
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        });
-
-        document.addEventListener('click', (event) => {
-            if (!hamburger.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.style.display = 'none';
+      // Script to automatically remove alerts after 2 seconds
+      document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        
+        if (alerts.length > 0) {
+          setTimeout(function() {
+            alerts.forEach(alert => {
+              alert.style.display = 'none';
+            });
+          }, 2000);
+        }
+        
+        // Mobile menu toggle functionality
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        const navButtons = document.querySelector('.nav-buttons');
+        
+        if (mobileMenuBtn) {
+          mobileMenuBtn.addEventListener('click', function() {
+            // Create mobile menu if it doesn't exist
+            if (!document.querySelector('.mobile-menu')) {
+              const mobileMenu = document.createElement('div');
+              mobileMenu.className = 'mobile-menu';
+              mobileMenu.style.position = 'fixed';
+              mobileMenu.style.top = '70px';
+              mobileMenu.style.left = '0';
+              mobileMenu.style.width = '100%';
+              mobileMenu.style.backgroundColor = '#fff';
+              mobileMenu.style.padding = '20px';
+              mobileMenu.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+              mobileMenu.style.zIndex = '999';
+              mobileMenu.style.display = 'none';
+              
+              // Clone nav links
+              if (navLinks) {
+                const clonedLinks = navLinks.cloneNode(true);
+                clonedLinks.style.display = 'flex';
+                clonedLinks.style.flexDirection = 'column';
+                clonedLinks.style.gap = '15px';
+                mobileMenu.appendChild(clonedLinks);
+              }
+              
+              // Clone nav buttons
+              if (navButtons) {
+                const clonedButtons = navButtons.cloneNode(true);
+                clonedButtons.style.display = 'flex';
+                clonedButtons.style.marginTop = '20px';
+                mobileMenu.appendChild(clonedButtons);
+              }
+              
+              document.body.appendChild(mobileMenu);
             }
-        });
+            
+            const mobileMenu = document.querySelector('.mobile-menu');
+            if (mobileMenu.style.display === 'none' || mobileMenu.style.display === '') {
+              mobileMenu.style.display = 'block';
+            } else {
+              mobileMenu.style.display = 'none';
+            }
+          });
+        }
+      });
     </script>
-</body>
+  </body>
 </html>

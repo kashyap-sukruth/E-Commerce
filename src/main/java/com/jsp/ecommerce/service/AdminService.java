@@ -16,4 +16,12 @@ public interface AdminService {
 
 	public String loadHome(HttpSession session);
 
+	public String viewProducts(HttpSession session, Model model);
+
+	public String approveProduct(Long id, HttpSession session);
+
+	public String rejectProduct(Long id, String reason, HttpSession session);
+
+//	public String rejectProduct(Long id, Model model, HttpSession session);
+
 }

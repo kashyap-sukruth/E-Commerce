@@ -21,3 +21,6 @@ cloudinary.api.secret=Your api secret
 #Razorpay Properties
 razor-pay.api.key=your key
 razor-pay.api.secret=your secret
+#Increase File Upload Size Limit
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB

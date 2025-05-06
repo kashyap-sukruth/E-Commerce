@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jsp.ecommerce.dto.UserDto;
+import com.jsp.ecommerce.helper.Status;
 import com.jsp.ecommerce.service.CustomerService;
 
 import jakarta.servlet.http.HttpSession;
@@ -51,5 +52,12 @@ public class CustomerController
 	public String loadHome(HttpSession session)
 	{
 		return customerService.loadHome(session);
+	}
+	
+	@GetMapping("/view-products")
+	public String viewApprovedProducts(HttpSession session,Model model)
+	{
+		return customerService.viewApprovedProducts(session,model);
+		
 	}
 }

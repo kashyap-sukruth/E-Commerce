@@ -1,5 +1,6 @@
 package com.jsp.ecommerce.service;
 
+import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +11,14 @@ import org.springframework.validation.BindingResult;
 import com.jsp.ecommerce.dto.UserDto;
 import com.jsp.ecommerce.entity.Admin;
 import com.jsp.ecommerce.entity.Customer;
+import com.jsp.ecommerce.entity.Product;
 import com.jsp.ecommerce.helper.AES;
 import com.jsp.ecommerce.helper.EmailSender;
+import com.jsp.ecommerce.helper.Status;
 import com.jsp.ecommerce.repository.AdminRepository;
 import com.jsp.ecommerce.repository.CustomerRepository;
 import com.jsp.ecommerce.repository.MerchantRepository;
+import com.jsp.ecommerce.repository.ProductRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -34,6 +38,9 @@ public class CustomerServiceimpl implements CustomerService {
 
 	@Autowired
 	Customer customer;
+	
+	@Autowired
+	ProductRepository productRepository;
 
 	public String register(UserDto userDto, Model model) {
 		model.addAttribute("userdto", userDto);
@@ -58,7 +65,7 @@ public class CustomerServiceimpl implements CustomerService {
 		}
 
 		int otp = new Random().nextInt(100000, 1000000);
-		System.out.println("otp is"+otp);
+		System.out.println("otp is" + otp);
 		emailSender.sendEmail(userDto, otp);
 
 		session.setAttribute("otp", otp);
@@ -70,7 +77,7 @@ public class CustomerServiceimpl implements CustomerService {
 	@Override
 	public String sumbitOtp(int otp, HttpSession session) {
 		int generatedOtp = (int) session.getAttribute("otp");
-	
+
 		if (generatedOtp == otp) {
 			UserDto dto = (UserDto) session.getAttribute("userDto");
 			customer.setName(dto.getName());
@@ -90,12 +97,30 @@ public class CustomerServiceimpl implements CustomerService {
 
 	@Override
 	public String loadHome(HttpSession session) {
-		Customer customer= (Customer) session.getAttribute("customer");
+		Customer customer = (Customer) session.getAttribute("customer");
 		if (customer != null)
 			return "customer-home.html";
 		else {
 			session.setAttribute("fail", "Invalid Session, First Login to Access");
 			return "redirect:/login";
 		}
+	}
+
+	@Override
+	public String viewApprovedProducts(HttpSession session, Model model) {
+		Customer customer = (Customer) session.getAttribute("customer");
+		if(customer!=null)
+		{
+			List<Product> products=productRepository.findByStatus(Status.APPROVED);
+			if (products.isEmpty()) {
+				session.setAttribute("fail", "No Products Approved Yet");
+				return "redirect:/customer/home";
+		}
+			else {
+				model.addAttribute("products", products);
+				return "viewApprovedProducts.html";
+	}
+}
+		return null;
 	}
 }

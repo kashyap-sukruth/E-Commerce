@@ -1,5 +1,6 @@
 package com.jsp.ecommerce.service;
 
+import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +10,14 @@ import org.springframework.validation.BindingResult;
 
 import com.jsp.ecommerce.dto.UserDto;
 import com.jsp.ecommerce.entity.Admin;
+import com.jsp.ecommerce.entity.Product;
 import com.jsp.ecommerce.helper.AES;
 import com.jsp.ecommerce.helper.EmailSender;
+import com.jsp.ecommerce.helper.Status;
 import com.jsp.ecommerce.repository.AdminRepository;
 import com.jsp.ecommerce.repository.CustomerRepository;
 import com.jsp.ecommerce.repository.MerchantRepository;
+import com.jsp.ecommerce.repository.ProductRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,6 +36,8 @@ public class AdminServiceImpl implements AdminService {
 	EmailSender emailSender;
 	@Autowired
 	Admin admin;
+	@Autowired
+	ProductRepository productRepository;
 
 	@Override
 	public String register(UserDto userDto, Model model) {
@@ -108,8 +114,75 @@ public class AdminServiceImpl implements AdminService {
 					return "redirect:/login";
 				}
 			}
+
+	@Override
+	public String viewProducts(HttpSession session, Model model) {
+		Admin admin = (Admin) session.getAttribute("admin");
+		if (admin != null) {
+			List<Product> products = productRepository.findAll();
+			if (products.isEmpty()) {
+				session.setAttribute("fail", "No Products Present Yet");
+				return "redirect:/admin/home";
+			} else {
+				model.addAttribute("products", products);
+				return "admin-products.html";
+			}
+	}
+		else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
 				
 				
 		
 	}
+
+	@Override
+	public String approveProduct(Long id, HttpSession session) {
+		Admin admin = (Admin) session.getAttribute("admin");
+		if (admin != null) 
+		{
+			Product product= productRepository.findById(id).orElseThrow();
+			 product.setStatus(Status.APPROVED);
+			 productRepository.save(product);
+			 session.setAttribute("pass", "Status Updated Success");
+				return "redirect:/admin/products";
+		}
+		
+	 else {
+		session.setAttribute("fail", "Invalid Session, First Login to Access");
+		return "redirect:/login";
+	}
+	}
+
+	@Override
+	public String rejectProduct(Long id, String reason, HttpSession session) {
+		Admin admin = (Admin) session.getAttribute("admin");
+		if (admin != null) {
+			Product product = productRepository.findById(id).orElseThrow();
+			product.setStatus(Status.REJECTED);
+			product.setReason(reason);
+			productRepository.save(product);
+			session.setAttribute("fail", "Status Updated Success");
+			return "redirect:/admin/products";
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+	}
+
+//	@Override
+//	public String rejectProduct(Long id, Model model, HttpSession session) {
+//		Admin admin = (Admin) session.getAttribute("admin");
+//		if (admin != null) {
+//			model.addAttribute("id", id);
+//			return "reason.html";
+//		} else {
+//			session.setAttribute("fail", "Invalid Session, First Login to Access");
+//			return "redirect:/login";
+//		}
+//	}
+	
+	
+}
 
