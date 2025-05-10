@@ -19,8 +19,10 @@ public interface CustomerService
 
 	public String loadHome(HttpSession session);
 
-	public String viewApprovedProducts(HttpSession session, Model model);
+//	public String viewApprovedProducts(HttpSession session, Model model);
 
 
+	String viewProducts(HttpSession session, Model model, String sort, String search, String category);
 
+	String addToCart(Long id, HttpSession session);
 }

@@ -29,5 +29,8 @@ public class OrderItem
 	
 	@ManyToOne
 	private Product product;
+
+	@ManyToOne
+	Cart cart;
 	
 }

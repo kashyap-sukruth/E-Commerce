@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import com.jsp.ecommerce.dto.UserDto;
 import com.jsp.ecommerce.helper.Status;
@@ -54,10 +51,21 @@ public class CustomerController
 		return customerService.loadHome(session);
 	}
 	
-	@GetMapping("/view-products")
-	public String viewApprovedProducts(HttpSession session,Model model)
+//	@GetMapping("/view-products")
+//	public String viewApprovedProducts(HttpSession session,Model model)
+//	{
+//		return customerService.viewApprovedProducts(session,model);
+//
+//	}
+
+	@GetMapping("/products")
+	public  String viewProducts(HttpSession session, Model model,@RequestParam(name = "category",required = false) String category,@RequestParam(name = "sort",required = false) String sort,@RequestParam(name = "search",required = false)String search)
 	{
-		return customerService.viewApprovedProducts(session,model);
-		
+		return customerService. viewProducts(session,model,sort,search,category);
+	}
+
+	@GetMapping("/add-cart/{id}")
+	public String addToCart(@PathVariable("id") Long id, HttpSession session) {
+		return customerService.addToCart(id, session);
 	}
 }

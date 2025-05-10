@@ -3,22 +3,18 @@ package com.jsp.ecommerce.service;
 import java.util.List;
 import java.util.Random;
 
+import com.jsp.ecommerce.entity.*;
+import com.jsp.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.jsp.ecommerce.dto.UserDto;
-import com.jsp.ecommerce.entity.Admin;
-import com.jsp.ecommerce.entity.Customer;
-import com.jsp.ecommerce.entity.Product;
 import com.jsp.ecommerce.helper.AES;
 import com.jsp.ecommerce.helper.EmailSender;
 import com.jsp.ecommerce.helper.Status;
-import com.jsp.ecommerce.repository.AdminRepository;
-import com.jsp.ecommerce.repository.CustomerRepository;
-import com.jsp.ecommerce.repository.MerchantRepository;
-import com.jsp.ecommerce.repository.ProductRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -38,9 +34,15 @@ public class CustomerServiceimpl implements CustomerService {
 
 	@Autowired
 	Customer customer;
-	
+
 	@Autowired
 	ProductRepository productRepository;
+
+	@Autowired
+	CartRepository cartRepository;
+
+	@Autowired
+	OrderItemRepository itemRepository;
 
 	public String register(UserDto userDto, Model model) {
 		model.addAttribute("userdto", userDto);
@@ -107,20 +109,108 @@ public class CustomerServiceimpl implements CustomerService {
 	}
 
 	@Override
-	public String viewApprovedProducts(HttpSession session, Model model) {
+	public String viewProducts(HttpSession session, Model model, String sort, String search, String category) {
 		Customer customer = (Customer) session.getAttribute("customer");
-		if(customer!=null)
-		{
-			List<Product> products=productRepository.findByStatus(Status.APPROVED);
+		if (customer != null) {
+			List<Product> products = null;
+
+			if (category == null && search == null && sort == null)
+				products = productRepository.findByStatus(Status.APPROVED, Sort.by("name").ascending());
+
+			if (sort != null) {
+				if (sort.equals("newest"))
+					products = productRepository.findByStatus(Status.APPROVED, Sort.by("createdAt").descending());
+				else {
+					String[] split = sort.split("_");
+					if (split[1].equals("asc"))
+						products = productRepository.findByStatus(Status.APPROVED, Sort.by(split[0]).ascending());
+					else
+						products = productRepository.findByStatus(Status.APPROVED, Sort.by(split[0]).descending());
+				}
+			}
+			if (category != null) {
+				products = productRepository.findByStatusAndCategory(Status.APPROVED, category,
+						Sort.by("name").ascending());
+			}
+			if (search != null) {
+				products = productRepository.findByStatusAndNameLike(Status.APPROVED, "%" + search + "%",
+						Sort.by("name").ascending());
+			}
 			if (products.isEmpty()) {
-				session.setAttribute("fail", "No Products Approved Yet");
+				session.setAttribute("fail", "No Products Added Yet");
 				return "redirect:/customer/home";
-		}
-			else {
+			} else {
 				model.addAttribute("products", products);
 				return "viewApprovedProducts.html";
+			}
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+
+	}
+
+	@Override
+	public String addToCart(Long id, HttpSession session) {
+		Customer customer = (Customer) session.getAttribute("customer");
+		if (customer != null) {
+			System.err.println("***** Valid Customer ********");
+			Product product = productRepository.findById(id).orElseThrow();
+
+			Cart cart = cartRepository.findByCustomer(customer);
+			if (cart == null) {
+
+				System.err.println("***** No Cart new One Created ********");
+
+				cart = new Cart();
+				cart.setCustomer(customer);
+				cartRepository.save(cart);
+			}
+			List<OrderItem> items = itemRepository.findByCart(cart);
+			if (items.isEmpty()) {
+				System.err.println("***** No Items in Cart so directly Added ********");
+				OrderItem item = new OrderItem();
+				item.setQuantity(1L);
+				item.setPrice(product.getPrice());
+				item.setProduct(product);
+				item.setCart(cart);
+				itemRepository.save(item);
+				session.setAttribute("pass", product.getName() + " added to cart success");
+			} else {
+				System.err.println("***** Items are present in Cart ********");
+				boolean flag = true;
+				for (OrderItem item : items) {
+					if (item.getProduct() == product) {
+						item.setQuantity(item.getQuantity() + 1);
+						itemRepository.save(item);
+						session.setAttribute("pass",
+								product.getName() + " was already in cart increased quantity success");
+						flag = false;
+						System.err.println("***** Same Item was there in cart ********");
+
+						break;
+					}
+				}
+
+				if (flag) {
+					System.err.println("***** Items are there but its not the same ********");
+
+					OrderItem item = new OrderItem();
+					item.setQuantity(1L);
+					item.setPrice(product.getPrice());
+					item.setProduct(product);
+					item.setCart(cart);
+					itemRepository.save(item);
+					session.setAttribute("pass", product.getName() + " added to cart success");
+				}
+			}
+			return "redirect:/customer/products";
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
 	}
 }
-		return null;
-	}
-}
+
+
+
