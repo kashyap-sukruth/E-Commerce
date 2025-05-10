@@ -50,13 +50,7 @@ public class CustomerController
 	{
 		return customerService.loadHome(session);
 	}
-	
-//	@GetMapping("/view-products")
-//	public String viewApprovedProducts(HttpSession session,Model model)
-//	{
-//		return customerService.viewApprovedProducts(session,model);
-//
-//	}
+
 
 	@GetMapping("/products")
 	public  String viewProducts(HttpSession session, Model model,@RequestParam(name = "category",required = false) String category,@RequestParam(name = "sort",required = false) String sort,@RequestParam(name = "search",required = false)String search)
@@ -67,5 +61,22 @@ public class CustomerController
 	@GetMapping("/add-cart/{id}")
 	public String addToCart(@PathVariable("id") Long id, HttpSession session) {
 		return customerService.addToCart(id, session);
+	}
+
+
+	@GetMapping("/cart")
+	public String viewCart(HttpSession session, Model model) {
+		return customerService.viewCart(session, model);
+	}
+
+	@GetMapping("/increase/{id}")
+	public String increase(@PathVariable("id") Long id, HttpSession session) {
+		return customerService.increaseQuantity(id, session);
+	}
+
+	@GetMapping("/decrease/{id}")
+	public String decrease(@PathVariable("id") Long id, HttpSession session) {
+		return customerService.
+				decreaseQuantity(id, session);
 	}
 }

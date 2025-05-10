@@ -1,0 +1,310 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<div align="center">
+    <h1>Cart Items</h1>
+    <div th:if="${session.pass}" class="alert alert-success">
+        <i class="fas fa-check-circle alert-icon"></i>
+        <span th:text="${session.pass}"></span>
+    </div>
+    <div th:if="${session.fail}" class="alert alert-danger">
+        <i class="fas fa-exclamation-circle alert-icon"></i>
+        <span th:text="${session.fail}"></span>
+    </div>
+    <th:block th:text="${@messageRemover.remove()}"></th:block>
+    <table border="1">
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+        </tr>
+        <tr th:each="item:${items}">
+            <td><img height="100px" width="100px" th:src="${item.product.imageUrl}" th:alt="${item.product.name}"></td>
+            <td th:text="${item.product.name}"></td>
+            <td th:text="${item.product.description}"></td>
+            <td th:text="${item.price}"></td>
+            <td>
+                <a th:href="'/customer/decrease/'+${item.id}"><button>-</button></a>
+                <span th:text="${item.quantity}"></span>
+                <a th:href="'/customer/increase/'+${item.id}"><button>+</button></a>
+            </td>
+            <td th:text="${item.price*item.quantity}"></td>
+        </tr>
+        <tr>
+            <th colspan="5"></th>
+            <th th:text="'Total Price: '+${total}"></th>
+        </tr>
+    </table>
+
+    <br>
+    <a href="/customer/home"><button>Back</button></a>
+</div>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | KartZo</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+            --accent-color: #e74a3b;
+            --success-color: #1cc88a;
+        }
+        
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', sans-serif;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        
+        .cart-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .cart-header {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 1rem;
+        }
+        
+        .product-img {
+            height: 80px;
+            width: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+        
+        .product-img:hover {
+            transform: scale(1.1);
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 8px;
+            transition: all 0.2s;
+        }
+        
+        .decrease-btn {
+            background-color: #8eafe3;
+            color: white;
+        }
+        
+        .increase-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .quantity-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: var(--secondary-color);
+        }
+        
+        .back-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: #2e59d9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .checkout-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+        
+        .checkout-btn:hover {
+            background-color: #169b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .empty-cart {
+            padding: 3rem;
+            text-align: center;
+            color: #6c757d;
+        }
+        
+        .price-column {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .total-price {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+        a {
+  text-decoration: none;
+}
+.quantity-column {
+    width: 130px;
+    white-space: nowrap;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cart-container">
+            <h1 class="cart-header text-center">
+                <i class="fas fa-shopping-cart me-2"></i>Your Shopping Cart
+            </h1>
+            
+            <!-- Alert Messages -->
+            <div th:if="${session.pass}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${session.pass}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <div th:if="${session.fail}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${session.fail}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <th:block th:text="${@messageRemover.remove()}"></th:block>
+            
+            <!-- Empty Cart Message -->
+            <div th:if="${#lists.isEmpty(items)}" class="empty-cart">
+                <i class="fas fa-shopping-basket fa-4x mb-3"></i>
+                <h3>Your cart is empty</h3>
+                <p>Looks like you haven't added any products to your cart yet.</p>
+                <a href="/customer/home" class="btn back-btn mt-3">
+                    <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                </a>
+            </div>
+            
+            <!-- Cart Items Table -->
+            <div th:if="${not #lists.isEmpty(items)}" class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th class="quantity-column">Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item:${items}">
+                            <td>
+                                <img class="product-img" th:src="${item.product.imageUrl}" th:alt="${item.product.name}">
+                            </td>
+                            <td>
+                                <h5 th:text="${item.product.name}"></h5>
+                                <p class="text-muted small" th:text="${item.product.description}"></p>
+                            </td>
+                            <td class="price-column" th:text="'₹ ' + ${item.price}"></td>
+                            <td  class="quantity-column">
+                                <div class="quantity-control">
+                                    <a th:href="'/customer/decrease/'+${item.id}" class="quantity-btn decrease-btn">
+                                        <i class="fas fa-minus"></i>
+                                    </a>
+                                    <span class="fw-bold" th:text="${item.quantity}"></span>
+                                    <a th:href="'/customer/increase/'+${item.id}" class="quantity-btn increase-btn">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="price-column" th:text="'₹ ' + ${item.price*item.quantity}"></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="4" class="text-end">Total:</td>
+                            <td class="total-price" th:text="'₹ ' + ${total}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div th:if="${not #lists.isEmpty(items)}" class="d-flex justify-content-between mt-4">
+                <a href="/customer/home" class="btn back-btn">
+                    <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                </a>
+                <a href="/customer/checkout" class="btn checkout-btn">
+                    <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

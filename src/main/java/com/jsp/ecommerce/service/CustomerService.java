@@ -25,4 +25,10 @@ public interface CustomerService
 	String viewProducts(HttpSession session, Model model, String sort, String search, String category);
 
 	String addToCart(Long id, HttpSession session);
+
+	String viewCart(HttpSession session, Model model);
+
+	String increaseQuantity(Long id, HttpSession session);
+
+	String decreaseQuantity(Long id, HttpSession session);
 }
