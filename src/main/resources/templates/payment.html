@@ -1,0 +1,275 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>Confirm Once</h1>
+    <h2>Mobile: <span th:text="${mobile}"></span></h2>
+    <h2>Address: <span th:text="${address}"></span></h2>
+    <h1>If Not Correct update in <a href="/customer/manage-profile"><button> Manage - Profile</button></a></h1>
+    <button id="rzp-button1">Pay with Razorpay</button>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script th:inline="javascript">
+var options = {
+    "key": [[${key}]],
+    "amount": "[[${amount}]]",
+    "currency": "INR",
+    "name": "KartZo",
+    "description": "Payment for Order",
+    "image": "/images/logo.png",
+    "order_id": [[${orderId}]], 
+    "callback_url": [[${url}]],
+    "prefill": {
+        "name": [[${session.customer.name}]],
+        "email": [[${session.customer.email}]],
+        "contact": ""
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
+</body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation | KartZo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #ff006e;
+            --accent: #8338ec;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #38b000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .confirmation-title {
+            font-size: 28px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background-color: var(--light);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .info-item i {
+            font-size: 24px;
+            color: var(--accent);
+            margin-right: 15px;
+            width: 30px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            margin-right: 10px;
+            color: var(--dark);
+        }
+        
+        .info-value {
+            font-weight: 400;
+            color: #555;
+        }
+        
+        .update-profile {
+            margin: 20px 0 30px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 5px 15px rgba(51, 153, 204, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(51, 153, 204, 0.4);
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 30px 0;
+        }
+        
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .secure-badge i {
+            color: var(--success);
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="/images/kartZologo-.png" alt="KartZo Logo" height="60">
+        </div>
+        
+        <h1 class="confirmation-title">Confirm Your Order</h1>
+        
+        <div class="info-card">
+            <div class="info-item">
+                <i class="fas fa-mobile-alt"></i>
+                <span class="info-label">Mobile:</span>
+                <span class="info-value" th:text="${mobile}">+91 9876543210</span>
+            </div>
+            
+            <div class="info-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span class="info-label">Delivery Address:</span>
+                <span class="info-value" th:text="${address}">123 Main Street, City</span>
+            </div>
+        </div>
+        
+        <div class="update-profile">
+            <p>Need to update your information?</p>
+            <a href="/customer/manage-profile" class="btn btn-outline">
+                <i class="fas fa-user-edit"></i> Update Profile
+            </a>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <button id="rzp-button1" class="btn btn-primary">
+            <i class="fas fa-credit-card"></i> Pay with Razorpay
+        </button>
+        
+        <div class="secure-badge">
+            <i class="fas fa-lock"></i> Secure Payment Powered by Razorpay
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script th:inline="javascript">
+    var options = {
+        "key": [[${key}]],
+        "amount": "[[${amount}]]",
+        "currency": "INR",
+        "name": "KartZo",
+        "description": "Payment for Order",
+        "image": "/images/logo.png",
+        "order_id": [[${orderId}]], 
+        "callback_url": [[${url}]],
+        "prefill": {
+            "name": [[${session.customer.name}]],
+            "email": [[${session.customer.email}]],
+            "contact": ""
+        },
+        "notes": {
+            "address": "Razorpay Corporate Office"
+        },
+        "theme": {
+            "color": "#3a86ff"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+    </script>
+</body>
+</html>

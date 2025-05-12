@@ -2,6 +2,7 @@ package com.jsp.ecommerce.entity;
 
 import java.time.LocalDateTime;
 
+import com.jsp.ecommerce.helper.PaymentStatus;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.jsp.ecommerce.helper.Status;
@@ -35,7 +36,7 @@ public class Payment
 	
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-    private Status status;
+    private PaymentStatus status;
 		
 	@CreationTimestamp
 	private LocalDateTime createdAt;

@@ -18,9 +18,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
+
 @Entity
 @Getter
 @Setter
+@Component
 public class Product 
 {
 	@Id

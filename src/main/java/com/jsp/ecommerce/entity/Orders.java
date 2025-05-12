@@ -3,19 +3,12 @@ package com.jsp.ecommerce.entity;
 import java.security.PrivateKey;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.jsp.ecommerce.helper.OrderStatus;
 import com.jsp.ecommerce.helper.PaymentStatus;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +17,8 @@ import lombok.Setter;
 @Setter
 public class Orders {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(generator = "orderId")
+	@SequenceGenerator(initialValue = 101001,allocationSize = 1,name = "orderId")
 	private Long id;
 	
 	@Column(nullable = false)
@@ -43,4 +37,10 @@ public class Orders {
 
 	@ManyToOne
 	private Customer customer;
+
+
+	@Column(nullable = false)
+	private Long mobile;
+	@Column(nullable = false)
+	private String address;
 }

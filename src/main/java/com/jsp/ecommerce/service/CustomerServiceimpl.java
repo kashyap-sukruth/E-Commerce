@@ -4,17 +4,16 @@ import java.util.List;
 import java.util.Random;
 
 import com.jsp.ecommerce.entity.*;
+import com.jsp.ecommerce.helper.*;
 import com.jsp.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import com.jsp.ecommerce.dto.UserDto;
-import com.jsp.ecommerce.helper.AES;
-import com.jsp.ecommerce.helper.EmailSender;
-import com.jsp.ecommerce.helper.Status;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -36,6 +35,9 @@ public class CustomerServiceimpl implements CustomerService {
 	Customer customer;
 
 	@Autowired
+	Product product;
+
+	@Autowired
 	ProductRepository productRepository;
 
 	@Autowired
@@ -43,6 +45,19 @@ public class CustomerServiceimpl implements CustomerService {
 
 	@Autowired
 	OrderItemRepository itemRepository;
+
+
+	@Autowired
+	OrderRepository orderRepository;
+
+	@Autowired
+	PaymentRepsoitory paymentRepsoitory;
+
+	@Autowired
+	RazorPayHelper payHelper;
+
+	@Value("${razor-pay.api.key}")
+	String key;
 
 	public String register(UserDto userDto, Model model) {
 		model.addAttribute("userdto", userDto);
@@ -111,7 +126,7 @@ public class CustomerServiceimpl implements CustomerService {
 	@Override
 	public String viewProducts(HttpSession session, Model model, String sort, String search, String category) {
 		Customer customer = (Customer) session.getAttribute("customer");
-		if (customer != null) {
+		if (customer != null ) {
 			List<Product> products = null;
 
 			if (category == null && search == null && sort == null)
@@ -170,7 +185,8 @@ public class CustomerServiceimpl implements CustomerService {
 				if (items.isEmpty()) {
 					System.err.println("***** No Items in Cart so directly Added ********");
 					OrderItem item = new OrderItem();
-					item.setQuantity(1L);
+					item.setQuantity(1);
+					item.setProductName(product.getName());
 					item.setPrice(product.getPrice());
 					item.setProduct(product);
 					item.setCart(cart);
@@ -196,7 +212,8 @@ public class CustomerServiceimpl implements CustomerService {
 						System.err.println("***** Items are there but its not the same ********");
 
 						OrderItem item = new OrderItem();
-						item.setQuantity(1L);
+						item.setQuantity(1);
+						item.setProductName(product.getName());
 						item.setPrice(product.getPrice());
 						item.setProduct(product);
 						item.setCart(cart);
@@ -228,6 +245,7 @@ public class CustomerServiceimpl implements CustomerService {
 					session.setAttribute("fail", "No Items in Cart");
 					return "redirect:/customer/home";
 				} else {
+
 					model.addAttribute("items", items);
 					model.addAttribute("total", items.stream().mapToDouble(x -> x.getPrice() * x.getQuantity()).sum());
 					return "view-cart.html";
@@ -280,7 +298,132 @@ public class CustomerServiceimpl implements CustomerService {
 			return "redirect:/login";
 		}
 	}
+
+	@Override
+	public String proceedPayment(HttpSession session, Model model) {
+		Customer customer = (Customer) session.getAttribute("customer");
+		if (customer != null) {
+			if (customer.getAddress() == null || customer.getMobile() == null) {
+				session.setAttribute("fail", "First add Address and Mobile Number in manage profile");
+				return "redirect:/customer/manage-profile";
+			}
+			else {
+				Cart cart = cartRepository.findByCustomer(customer);
+				if (cart == null) {
+					session.setAttribute("fail", "No Items in Cart");
+					return "redirect:/customer/home";
+
+				} else {
+					List<OrderItem> items = itemRepository.findByCart(cart);
+					if (items.isEmpty()) {
+						session.setAttribute("fail", "No Items in Cart");
+						return "redirect:/customer/home";
+					} else {
+						double amount = items.stream().mapToDouble(x -> x.getPrice() * x.getQuantity()).sum();
+						String orderId = payHelper.createPayment(amount);
+
+						Orders order = new Orders();
+						order.setCustomer(customer);
+						order.setOrderStatus(OrderStatus.PLACED);
+						order.setPaymentStatus(PaymentStatus.PENDING);
+						order.setTotalAmount(amount);
+						order.setAddress(customer.getAddress());
+						order.setMobile(customer.getMobile());
+						orderRepository.save(order);
+
+						model.addAttribute("address", customer.getAddress());
+						model.addAttribute("mobile", customer.getMobile());
+						model.addAttribute("key", key);
+						model.addAttribute("amount", amount * 100);
+						model.addAttribute("orderId", orderId);
+						model.addAttribute("url", "/customer/payment/" + order.getId());
+
+						return "payment.html";
+					}
+				}
+			}
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+	}
+
+	@Override
+	public String confirmPament(Long id, String paymentId, HttpSession session) {
+		Customer customer = (Customer) session.getAttribute("customer");
+		if (customer != null) {
+			Orders order = orderRepository.findById(id).orElseThrow();
+			if (paymentId != null)
+				order.setPaymentStatus(PaymentStatus.PAID);
+			else
+				order.setPaymentStatus(PaymentStatus.FAILED);
+
+			orderRepository.save(order);
+			Payment payment = new Payment();
+			payment.setAmount(order.getTotalAmount());
+			payment.setOrders(order);
+			payment.setPaymentId(paymentId);
+			payment.setStatus(PaymentStatus.PAID);
+			paymentRepsoitory.save(payment);
+
+			Cart cart = cartRepository.findByCustomer(customer);
+			List<OrderItem> items = itemRepository.findByCart(cart);
+			for (OrderItem item : items) {
+				item.setCart(null);
+				item.setOrders(order);
+				itemRepository.save(item);
+				Product product = item.getProduct();
+				product.setStock(product.getStock() - item.getQuantity());
+				productRepository.save(product);
+			}
+
+			session.setAttribute("pass", "Payment Success and Order Placed");
+			return "redirect:/customer/home";
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+	}
+
+	@Override
+	public String manageProfile(HttpSession session, Model model) {
+        Customer customer = (Customer) session.getAttribute("customer");
+        if (customer != null) {
+            model.addAttribute("name", customer.getName());
+            model.addAttribute("address", customer.getAddress());
+            model.addAttribute("mobile", customer.getMobile());
+            return "customer-manage-profile";
+        } else {
+            session.setAttribute("fail", "Invalid Session, First Login to Access");
+            return "redirect:/login";
+        }
+	}
+
+	@Override
+	public String manageProfile(HttpSession session, UserDto dto, Long mobile, String address) {
+		Customer customer = (Customer) session.getAttribute("customer");
+		if (customer != null) {
+			if (dto.getPassword().length()>0 && !dto.getPassword().matches("^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$")) {
+				session.setAttribute("fail",
+						"Password is Not Strong Enough Should be 8 char with one upper , lower , special char and digit");
+				return "redirect:/customer/manage-profile";
+			} else {
+				customer.setMobile(mobile);
+				customer.setAddress(address);
+				customer.setName(dto.getName());
+				if(dto.getPassword().length()>0)
+					customer.setPassword(AES.encrypt(dto.getPassword()));
+				customerRepository.save(customer);
+				session.setAttribute("pass", "Profile Updated Success");
+				return "redirect:/customer/home";
+			}
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+	}
 }
+
 
 
 

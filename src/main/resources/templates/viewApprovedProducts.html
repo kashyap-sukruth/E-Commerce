@@ -711,7 +711,7 @@
         <div class="filter-group">
           <span class="filter-label">Category:</span>
           <select id="categoryFilter" class="filter-select">
-            <option value="">All Categories</option>
+            <option value="AllCat">All Categories</option>
             <option value="electronics">Electronics</option>
             <option value="fashion">Fashion</option>
             <option value="grocery">Grocery</option>
@@ -721,7 +721,7 @@
           
           <span class="filter-label">Sort By:</span>
           <select id="sortFilter" class="filter-select">
-            <option value=""> Default-Name (A-Z)</option>
+            <option value="Default"> Default-Name (A-Z)</option>
             <option value="name_asc">Name (A-Z)</option>
             <option value="name_desc">Name (Z-A)</option>
             <option value="price_asc">Price (Low to High)</option>
@@ -745,8 +745,8 @@
 
       <!-- Grid View (Default) -->
       <div id="gridView" class="products-grid" th:if="${not #lists.isEmpty(products)}">
-        <div class="product-card" th:each="product : ${products}">
-          <img class="product-image" th:src="${product.imageUrl}" alt="Product Image" />
+        <div class="product-card" th:each="product : ${products}"  th:if="${product.stock>0}">
+          <img class="product-image" th:src="${product.imageUrl}" alt="Product Image"  height="200px" width="200px"/>
           <div class="product-details">
             <span class="product-category" th:text="${product.category}"></span>
             <h3 class="product-name" th:text="${product.name}"></h3>
@@ -780,9 +780,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr th:each="product : ${products}">
+          <tr th:each="product : ${products}"  th:if="${product.stock>0}">
             <td>
-              <img class="table-product-image" th:src="${product.imageUrl}" alt="Product Image" />
+              <img class="table-product-image" th:src="${product.imageUrl}"  alt="Product Image" />
             </td>
             <td class="table-product-name" th:text="${product.name}"></td>
             <td class="table-product-description" th:text="${product.description}"></td>

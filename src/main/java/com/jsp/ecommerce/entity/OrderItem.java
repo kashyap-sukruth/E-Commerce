@@ -17,9 +17,11 @@ public class OrderItem
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
+	private String productName;
+
 	@Column(nullable = false)
-	private Long quantity;
+	private Integer quantity;
 	
 	@Column(nullable = false)
 	private Double price;
