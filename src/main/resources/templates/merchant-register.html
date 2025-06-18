@@ -549,6 +549,16 @@
             <span class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
           </div>
         </div>
+
+
+        <div class="form-group">
+          <label for="PhoneNo">Phone No</label>
+          <div class="input-with-icon">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="text" id="PhoneNo" name="PhoneNo" th:field="*{phoneNo}" placeholder="Enter your Phone Number"   title="Enter a 10-digit mobile number"  />
+            <span class="error-message" th:if="${#fields.hasErrors('PhoneNo')}" th:errors="*{PhoneNo}"></span>
+          </div>
+        </div>
         
         <div class="form-group">
           <label for="password">Password</label>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order History | KartZo</title>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+    />
+    <style>
+        :root {
+          --primary: #2563eb;
+          --primary-dark: #1d4ed8;
+          --secondary: #7c3aed;
+          --accent: #f59e0b;
+          --light: #f9fafb;
+          --dark: #111827;
+          --success: #10b981;
+          --danger: #ef4444;
+          --gray: #6b7280;
+          --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+          --transition: all 0.3s ease;
+          --customer: #7c3aed;
+          --customer-dark: #6d28d9;
+          --customer-gradient: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: "Montserrat", sans-serif;
+        }
+
+        body {
+          min-height: 100vh;
+          background-color: var(--light);
+          color: var(--dark);
+          display: flex;
+          flex-direction: column;
+        }
+
+        .navbar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem 5%;
+          background-color: #ffffff;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
+
+        .logo {
+          display: flex;
+          align-items: center;
+        }
+
+        .logo a {
+          text-decoration: none;
+          color: var(--dark);
+          display: flex;
+          align-items: center;
+        }
+
+        .logo i {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-right: 10px;
+        }
+
+        .logo h1 {
+          font-size: 1.8rem;
+          color: var(--primary);
+          font-weight: 700;
+        }
+
+        .customer-badge {
+          background: var(--customer-gradient);
+          color: white;
+          padding: 5px 12px;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          margin-left: 10px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .logout-btn {
+          padding: 10px 20px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: var(--transition);
+          background-color: transparent;
+          color: var(--primary);
+          border: 2px solid var(--primary);
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .logout-btn:hover {
+          background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem;
+          flex: 1;
+        }
+
+        .page-title {
+          background: linear-gradient(
+            135deg,
+            var(--primary) 0%,
+            var(--secondary) 100%
+          );
+          color: white;
+          padding: 2rem;
+          border-radius: 15px;
+          margin-bottom: 2rem;
+          box-shadow: 0 5px 15px rgba(124, 58, 237, 0.2);
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .page-title::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23ffffff" fill-opacity="0.05" d="M0,160L48,144C96,128,192,96,288,106.7C384,117,480,171,576,186.7C672,203,768,181,864,154.7C960,128,1056,96,1152,96C1248,96,1344,128,1392,144L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E');
+          background-size: cover;
+          background-position: center;
+        }
+
+        .page-title h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+          position: relative;
+          z-index: 1;
+        }
+
+        .page-title p {
+          opacity: 0.9;
+          position: relative;
+          z-index: 1;
+        }
+
+        .orders-container {
+          background-color: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+          border: 1px solid #f3f4f6;
+          transition: var(--transition);
+          overflow-x: auto;
+        }
+
+        .orders-container:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-orders {
+          background-color: #eff6ff;
+          color: #1e40af;
+          padding: 2rem;
+          border-radius: 8px;
+          text-align: center;
+          border-left: 4px solid var(--primary);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .empty-orders i {
+          font-size: 3rem;
+          color: var(--primary);
+        }
+
+        .empty-orders p {
+          font-size: 1.2rem;
+          font-weight: 500;
+        }
+
+        .orders-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .orders-table th {
+          background-color: #f9fafb;
+          color: var(--dark);
+          font-weight: 600;
+          text-align: left;
+          padding: 1rem;
+          border-bottom: 2px solid #e5e7eb;
+        }
+
+        .orders-table td {
+          padding: 1rem;
+          border-bottom: 1px solid #e5e7eb;
+          color: var(--gray);
+        }
+
+        .orders-table tr:last-child td {
+          border-bottom: none;
+        }
+
+        .orders-table tr:hover td {
+          background-color: #f9fafb;
+        }
+
+        .order-id {
+          font-weight: 600;
+          color: var(--primary);
+        }
+
+        .order-date {
+          white-space: nowrap;
+        }
+
+        .order-amount {
+          font-weight: 600;
+          color: var(--dark);
+        }
+
+        .order-status {
+          display: inline-block;
+          padding: 5px 12px;
+          border-radius: 20px;
+          font-weight: 500;
+          font-size: 0.9rem;
+          white-space: nowrap;
+        }
+
+        .status-pending {
+          background-color: #fff7ed;
+          color: #9a3412;
+        }
+
+        .status-processing {
+          background-color: #ecfdf5;
+          color: #065f46;
+        }
+
+        .status-shipped {
+          background-color: #eff6ff;
+          color: #1e40af;
+        }
+
+        .status-delivered {
+          background-color: #f0fdf4;
+          color: #166534;
+        }
+
+        .status-cancelled {
+          background-color: #fef2f2;
+          color: #991b1b;
+        }
+
+        .order-address,
+        .order-mobile {
+          max-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .order-products {
+          max-width: 300px;
+        }
+
+        .product-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .product-item {
+          background-color: #f9fafb;
+          padding: 8px 12px;
+          border-radius: 6px;
+          margin-bottom: 8px;
+          font-size: 0.9rem;
+          border-left: 3px solid var(--secondary);
+        }
+
+        .product-item:last-child {
+          margin-bottom: 0;
+        }
+
+        .btn {
+          padding: 12px 25px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          transition: var(--transition);
+          font-size: 1rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          text-decoration: none;
+          margin-top: 1.5rem;
+        }
+
+        .btn-secondary {
+          background-color: transparent;
+          color: var(--primary);
+          border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+          background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .footer {
+          background-color: #1e293b;
+          color: white;
+          padding: 3rem 5% 1.5rem;
+          margin-top: auto;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .footer::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23ffffff" fill-opacity="0.05" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,202.7C672,203,768,181,864,186.7C960,192,1056,224,1152,218.7C1248,213,1344,171,1392,149.3L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"%3E%3C/path%3E%3C/svg%3E');
+          background-size: cover;
+          background-position: center;
+          opacity: 0.5;
+        }
+
+        .footer-bottom {
+          text-align: center;
+          padding-top: 1.5rem;
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 0.9rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Accessibility improvements */
+        .skip-link {
+          position: absolute;
+          top: -40px;
+          left: 0;
+          background: var(--primary);
+          color: white;
+          padding: 8px;
+          z-index: 1001;
+          transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+          top: 0;
+        }
+
+        button:focus,
+        a:focus {
+          outline: 2px solid var(--primary);
+          outline-offset: 2px;
+        }
+
+        /* Animation classes */
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fadeInUp {
+          animation: fadeInUp 0.6s forwards;
+        }
+
+        @media (max-width: 1024px) {
+          .orders-table {
+            min-width: 900px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .navbar {
+            padding: 1rem 3%;
+          }
+          .logo h1 {
+            font-size: 1.5rem;
+          }
+          .container {
+            padding: 1.5rem;
+          }
+          .page-title {
+            padding: 1.5rem;
+          }
+          .page-title h1 {
+            font-size: 2rem;
+          }
+          .orders-container {
+            padding: 1.5rem;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .page-title h1 {
+            font-size: 1.8rem;
+          }
+        }
+    </style>
+</head>
+<body>
+<!-- Accessibility skip link -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav class="navbar">
+    <div class="logo">
+        <a href="/customer/home">
+            <i class="fas fa-shopping-bag"></i>
+            <h1>KartZo</h1>
+        </a>
+        <span class="customer-badge">
+          <i class="fas fa-user"></i> Customer
+        </span>
+    </div>
+
+    <a href="/logout" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</nav>
+
+<main id="main-content" class="container">
+    <div class="page-title">
+        <h1>Your Order History</h1>
+        <p>View and track all your previous orders</p>
+    </div>
+
+    <div class="orders-container animate-fadeInUp">
+        <div th:if="${orders.empty}" class="empty-orders">
+            <i class="fas fa-shopping-cart"></i>
+            <p>You haven't placed any orders yet.</p>
+            <a href="/customer/home" class="btn btn-secondary">
+                <i class="fas fa-shopping-bag"></i> Start Shopping
+            </a>
+        </div>
+
+        <div th:unless="${orders.empty}">
+            <div class="table-responsive">
+                <table class="orders-table">
+                    <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                        <th>Mobile</th>
+                        <th>Products</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td class="order-id" th:text="${order.id}"></td>
+                        <td
+                                class="order-date"
+                                th:text="${#temporals.format(order.createdAt, 'dd-MM-yyyy HH:mm')}"
+                        ></td>
+                        <td class="order-amount">
+                            ₹<span
+                                th:text="${#numbers.formatDecimal(order.totalAmount, 0, 2)}"
+                        ></span>
+                        </td>
+                        <td>
+                    <span
+                            class="order-status"
+                            th:classappend="${
+                        order.orderStatus == 'PENDING' ? 'status-pending' :
+                        order.orderStatus == 'PROCESSING' ? 'status-processing' :
+                        order.orderStatus == 'SHIPPED' ? 'status-shipped' :
+                        order.orderStatus == 'DELIVERED' ? 'status-delivered' :
+                        'status-cancelled'
+                      }"
+                            th:text="${order.orderStatus}"
+                    ></span>
+                        </td>
+                        <td
+                                class="order-address"
+                                th:text="${order.address}"
+                                th:title="${order.address}"
+                        ></td>
+                        <td class="order-mobile" th:text="${order.mobile}"></td>
+                        <td class="order-products">
+                            <ul class="product-list">
+                                <li
+                                        class="product-item"
+                                        th:each="orderItem : ${@orderItemRepository.findByOrdersId(order.id)}"
+                                >
+                                    <strong th:text="${orderItem.product.name}"></strong>
+                                    <div>
+                                        Quantity:
+                                        <span th:text="${orderItem.quantity}"></span>
+                                    </div>
+                                    <div>
+                                        Price: ₹<span
+                                            th:text="${#numbers.formatDecimal(orderItem.price, 0, 2)}"
+                                    ></span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <a href="/customer/home" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-bottom">
+        <p>&copy; 2025 KartZo. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Add animation to elements
+      const observeElements = (elements, className) => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add(className);
+              }
+            });
+          },
+          {
+            threshold: 0.1,
+          }
+        );
+        elements.forEach((element) => {
+          observer.observe(element);
+        });
+      };
+
+      // Apply animations if supported
+      if ("IntersectionObserver" in window) {
+        const ordersContainer = document.querySelector(".orders-container");
+
+        if (ordersContainer) {
+          ordersContainer.style.opacity = "0";
+          observeElements([ordersContainer], "animate-fadeInUp");
+        }
+      }
+    });
+</script>
+</body>
+</html>

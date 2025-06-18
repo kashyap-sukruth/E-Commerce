@@ -98,6 +98,23 @@ public class CustomerController
 	@PostMapping("/manage-profile")
 	public String manageProfile(HttpSession session, @ModelAttribute UserDto dto, @RequestParam("address") String address,
 								@RequestParam("mobile") Long mobile) {
-		return customerService.manageProfile(session, dto, mobile, address);
+		return customerService.manageProfile(session, dto, mobile,
+				address);
+	}
+
+
+	@GetMapping("/order-history")
+	public String orderHistory(HttpSession session, Model model) {
+		return customerService.orderHistory(session, model);
+	}
+
+	@GetMapping("/track-orders")
+	public String trackOrders(HttpSession session) {
+		return customerService.loadTrackOrder(session);
+	}
+
+	@PostMapping("/track-orders")
+	public String trackOrders(@RequestParam Long orderId, HttpSession session, Model model) {
+		return customerService.trackOrders(orderId, session, model);
 	}
 }

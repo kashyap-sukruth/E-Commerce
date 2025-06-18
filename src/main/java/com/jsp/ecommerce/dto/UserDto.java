@@ -1,10 +1,6 @@
 package com.jsp.ecommerce.dto;
 
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 @Getter
@@ -22,5 +18,6 @@ public class UserDto
 	private String confirmPassword;
 	@AssertTrue(message = "* Check terms and Condition in order to proceed")
 	private boolean terms;
-
+	@Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
+	private String phoneNo;
 }

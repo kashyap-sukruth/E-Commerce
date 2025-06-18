@@ -589,7 +589,7 @@
       // Script to automatically remove alerts after 2 seconds
       document.addEventListener('DOMContentLoaded', function() {
         const alerts = document.querySelectorAll('.alert');
-        
+
         if (alerts.length > 0) {
           setTimeout(function() {
             alerts.forEach(alert => {
@@ -597,12 +597,12 @@
             });
           }, 2000);
         }
-        
+
         // Mobile menu toggle functionality
         const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
         const navLinks = document.querySelector('.nav-links');
         const navButtons = document.querySelector('.nav-buttons');
-        
+
         if (mobileMenuBtn) {
           mobileMenuBtn.addEventListener('click', function() {
             // Create mobile menu if it doesn't exist
@@ -618,7 +618,7 @@
               mobileMenu.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
               mobileMenu.style.zIndex = '999';
               mobileMenu.style.display = 'none';
-              
+
               // Clone nav links
               if (navLinks) {
                 const clonedLinks = navLinks.cloneNode(true);
@@ -627,7 +627,7 @@
                 clonedLinks.style.gap = '15px';
                 mobileMenu.appendChild(clonedLinks);
               }
-              
+
               // Clone nav buttons
               if (navButtons) {
                 const clonedButtons = navButtons.cloneNode(true);
@@ -635,10 +635,10 @@
                 clonedButtons.style.marginTop = '20px';
                 mobileMenu.appendChild(clonedButtons);
               }
-              
+
               document.body.appendChild(mobileMenu);
             }
-            
+
             const mobileMenu = document.querySelector('.mobile-menu');
             if (mobileMenu.style.display === 'none' || mobileMenu.style.display === '') {
               mobileMenu.style.display = 'block';

@@ -31,4 +31,8 @@ public interface MerchantService {
 			Model model);
 
 	public String deleteById(Long id, HttpSession session);
+
+	String manageProfile(HttpSession session, Model model);
+
+	String manageProfile(HttpSession session, UserDto dto, String mobile);
 }

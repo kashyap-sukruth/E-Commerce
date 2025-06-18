@@ -93,6 +93,7 @@ public class MerchantServiceImpl implements MerchantService {
 			merchant1.setName(dto.getName());
 			merchant1.setEmail(dto.getEmail());
 			merchant1.setPassword(AES.encrypt(dto.getPassword()));
+			merchant1.setPhoneNo(dto.getPhoneNo());
 			merchantRepository.save(merchant1);
 			session.setAttribute("pass", "Account created success");
 			session.removeAttribute("otp");
@@ -205,8 +206,8 @@ public class MerchantServiceImpl implements MerchantService {
 	}
 
 	@Override
-	public String updateProduct( ProductDto productDto, BindingResult result, HttpSession session, Long id,
-			Model model) {
+	public String updateProduct(ProductDto productDto, BindingResult result, HttpSession session, Long id,
+								Model model) {
 		Merchant merchant = (Merchant) session.getAttribute("merchant");
 		if (merchant != null) {
 			Product product = productRepository.findById(id).orElseThrow();
@@ -232,8 +233,7 @@ public class MerchantServiceImpl implements MerchantService {
 			productRepository.save(product);
 			session.setAttribute("pass", "product updated successfully!");
 			return "redirect:/merchant/manage-products";
-		}
-		else {
+		} else {
 			session.setAttribute("fail", "Invalid Session, First Login to Access");
 			return "redirect:/login";
 		}
@@ -251,4 +251,44 @@ public class MerchantServiceImpl implements MerchantService {
 			return "redirect:/login";
 		}
 	}
+
+	@Override
+	public String manageProfile(HttpSession session, Model model) {
+		Merchant merchant = (Merchant) session.getAttribute("merchant");
+		if (merchant != null) {
+			model.addAttribute("name", merchant.getName());
+			model.addAttribute("phoneNo", merchant.getPhoneNo());
+			return "merchant-manage-profile";
+		}
+		else
+		{
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
 	}
+
+
+
+	@Override
+	public String manageProfile(HttpSession session, UserDto dto, String mobile) {
+		Merchant merchant = (Merchant) session.getAttribute("merchant");
+		if (merchant != null) {
+			if (dto.getPassword().length()>0 && !dto.getPassword().matches("^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$")) {
+				session.setAttribute("fail",
+						"Password is Not Strong Enough Should be 8 char with one upper , lower , special char and digit");
+				return "redirect:/customer/manage-profile";
+			} else {
+				merchant.setPhoneNo(mobile);
+				merchant.setName(dto.getName());
+				if(dto.getPassword().length()>0)
+					merchant.setPassword(AES.encrypt(dto.getPassword()));
+				merchantRepository.save(merchant);
+				session.setAttribute("pass", "Profile Updated Success");
+				return "redirect:/merchant/home";
+			}
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+	}
+}

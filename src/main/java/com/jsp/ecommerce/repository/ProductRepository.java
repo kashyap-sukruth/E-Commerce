@@ -17,4 +17,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	List<Product> findByStatusAndCategory(Status status, String category, Sort name);
 
 	List<Product> findByStatusAndNameLike(Status status, String s, Sort name);
+
+    List<Product> findByStatusAndCategoryAndStockGreaterThan(Status status, String category,Integer stock, Sort name);
 }

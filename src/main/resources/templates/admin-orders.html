@@ -1,0 +1,635 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Management | KartZo</title>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+    />
+    <style>
+        :root {
+          --primary: #2563eb;
+          --primary-dark: #1d4ed8;
+          --secondary: #7c3aed;
+          --accent: #f59e0b;
+          --light: #f9fafb;
+          --dark: #111827;
+          --success: #10b981;
+          --danger: #ef4444;
+          --gray: #6b7280;
+          --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+          --transition: all 0.3s ease;
+          --admin: #7c3aed;
+          --admin-dark: #6d28d9;
+          --admin-gradient: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: "Montserrat", sans-serif;
+        }
+
+        body {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          background-color: var(--light);
+          color: var(--dark);
+        }
+
+        .navbar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem 5%;
+          background-color: #ffffff;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
+
+        .logo {
+          display: flex;
+          align-items: center;
+        }
+
+        .logo a {
+          text-decoration: none;
+          color: var(--dark);
+          display: flex;
+          align-items: center;
+        }
+
+        .logo i {
+          font-size: 2rem;
+          color: var(--primary);
+          margin-right: 10px;
+        }
+
+        .logo h1 {
+          font-size: 1.8rem;
+          color: var(--primary);
+          font-weight: 700;
+        }
+
+        .admin-badge {
+          background: var(--admin-gradient);
+          color: white;
+          padding: 5px 12px;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          margin-left: 10px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .nav-buttons {
+          display: flex;
+          gap: 15px;
+        }
+
+        .nav-btn {
+          padding: 10px 20px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: var(--transition);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          text-decoration: none;
+        }
+
+        .dashboard-btn {
+          background-color: transparent;
+          color: var(--primary);
+          border: 2px solid var(--primary);
+        }
+
+        .dashboard-btn:hover {
+          background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .logout-btn {
+          background-color: var(--primary);
+          color: white;
+        }
+
+        .logout-btn:hover {
+          background-color: var(--primary-dark);
+          transform: translateY(-2px);
+        }
+
+        .alert {
+          position: fixed;
+          top: 80px;
+          left: 50%;
+          transform: translateX(-50%);
+          padding: 15px 25px;
+          border-radius: 10px;
+          box-shadow: var(--shadow);
+          z-index: 1001;
+          display: flex;
+          align-items: center;
+          min-width: 300px;
+          max-width: 500px;
+          animation: slideDown 0.3s, fadeOut 0.5s 1.5s forwards;
+        }
+
+        .alert-success {
+          background-color: #ecfdf5;
+          color: #065f46;
+          border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+          background-color: #fef2f2;
+          color: #991b1b;
+          border-left: 4px solid var(--danger);
+        }
+
+        .alert-icon {
+          margin-right: 10px;
+          font-size: 1.2rem;
+        }
+
+        @keyframes slideDown {
+          from {
+            transform: translate(-50%, -20px);
+            opacity: 0;
+          }
+          to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+            visibility: hidden;
+          }
+        }
+
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem;
+          flex: 1;
+        }
+
+        .page-header {
+          background: var(--admin-gradient);
+          color: white;
+          padding: 2rem;
+          border-radius: 15px;
+          margin-bottom: 2rem;
+          box-shadow: 0 5px 15px rgba(124, 58, 237, 0.2);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .page-header::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23ffffff" fill-opacity="0.05" d="M0,160L48,144C96,128,192,96,288,106.7C384,117,480,171,576,186.7C672,203,768,181,864,154.7C960,128,1056,96,1152,96C1248,96,1344,128,1392,144L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E');
+          background-size: cover;
+          background-position: center;
+        }
+
+        .page-title {
+          font-size: 2.5rem;
+          font-weight: 700;
+          position: relative;
+          z-index: 1;
+        }
+
+        .orders-container {
+          background-color: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+          border: 1px solid #f3f4f6;
+          transition: var(--transition);
+          overflow-x: auto;
+        }
+
+        .orders-container:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .orders-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .orders-table th {
+          background-color: #f3f4f6;
+          color: var(--dark);
+          font-weight: 600;
+          text-align: left;
+          padding: 1rem;
+          border-bottom: 2px solid #e5e7eb;
+        }
+
+        .orders-table td {
+          padding: 1rem;
+          border-bottom: 1px solid #e5e7eb;
+          vertical-align: middle;
+        }
+
+        .orders-table tr:last-child td {
+          border-bottom: none;
+        }
+
+        .orders-table tr:hover {
+          background-color: #f9fafb;
+        }
+
+        .order-id {
+          font-weight: 600;
+          color: var(--admin);
+        }
+
+        .customer-name {
+          font-weight: 500;
+        }
+
+        .order-date {
+          color: var(--gray);
+        }
+
+        .order-total {
+          font-weight: 600;
+          color: var(--dark);
+        }
+
+        .status-badge {
+          padding: 5px 12px;
+          border-radius: 20px;
+          font-size: 0.85rem;
+          font-weight: 500;
+          display: inline-block;
+        }
+
+        .status-pending {
+          background-color: #fff7ed;
+          color: #9a3412;
+        }
+
+        .status-processing {
+          background-color: #eff6ff;
+          color: #1e40af;
+        }
+
+        .status-shipped {
+          background-color: #f0f9ff;
+          color: #0369a1;
+        }
+
+        .status-delivered {
+          background-color: #ecfdf5;
+          color: #065f46;
+        }
+
+        .status-cancelled {
+          background-color: #fef2f2;
+          color: #991b1b;
+        }
+
+        .status-select {
+          padding: 8px 12px;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          background-color: white;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: var(--dark);
+          cursor: pointer;
+          transition: var(--transition);
+          width: 100%;
+          max-width: 180px;
+        }
+
+        .status-select:focus {
+          outline: none;
+          border-color: var(--admin);
+          box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .status-select:hover {
+          border-color: var(--admin);
+        }
+
+        .footer {
+          background-color: #1e293b;
+          color: white;
+          padding: 3rem 5% 1.5rem;
+          margin-top: auto;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .footer::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23ffffff" fill-opacity="0.05" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,202.7C672,203,768,181,864,186.7C960,192,1056,224,1152,218.7C1248,213,1344,171,1392,149.3L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"%3E%3C/path%3E%3C/svg%3E');
+          background-size: cover;
+          background-position: center;
+          opacity: 0.5;
+        }
+
+        .footer-bottom {
+          text-align: center;
+          padding-top: 1.5rem;
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 0.9rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Accessibility improvements */
+        .skip-link {
+          position: absolute;
+          top: -40px;
+          left: 0;
+          background: var(--primary);
+          color: white;
+          padding: 8px;
+          z-index: 1001;
+          transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+          top: 0;
+        }
+
+        button:focus,
+        a:focus,
+        select:focus {
+          outline: 2px solid var(--primary);
+          outline-offset: 2px;
+        }
+
+        /* Animation classes */
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fadeInUp {
+          animation: fadeInUp 0.6s forwards;
+        }
+
+        @media (max-width: 1024px) {
+          .orders-table {
+            min-width: 900px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .navbar {
+            padding: 1rem 3%;
+          }
+          .logo h1 {
+            font-size: 1.5rem;
+          }
+          .container {
+            padding: 1.5rem;
+          }
+          .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+          }
+          .page-title {
+            font-size: 2rem;
+          }
+          .orders-container {
+            padding: 1.5rem;
+          }
+          .nav-buttons {
+            flex-direction: column;
+            gap: 10px;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .page-title {
+            font-size: 1.8rem;
+          }
+          .alert {
+            min-width: 90%;
+          }
+        }
+    </style>
+</head>
+<body>
+<!-- Accessibility skip link -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav class="navbar">
+    <div class="logo">
+        <a href="/admin/home">
+            <i class="fas fa-shopping-bag"></i>
+            <h1> KartZo</h1>
+        </a>
+        <span class="admin-badge">
+          <i class="fas fa-user-shield"></i> Admin
+        </span>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="/admin/home" class="nav-btn dashboard-btn">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="/logout" class="nav-btn logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
+
+<!-- Alert messages that will disappear after 2 seconds -->
+<div th:if="${session.pass}" class="alert alert-success">
+    <i class="fas fa-check-circle alert-icon"></i>
+    <span th:text="${session.pass}"></span>
+</div>
+
+<div th:if="${session.fail}" class="alert alert-danger">
+    <i class="fas fa-exclamation-circle alert-icon"></i>
+    <span th:text="${session.fail}"></span>
+</div>
+
+<th:block th:text="${@messageRemover.remove()}"></th:block>
+
+<main id="main-content" class="container">
+    <div class="page-header">
+        <h1 class="page-title">Order Management</h1>
+    </div>
+
+    <div class="orders-container animate-fadeInUp">
+        <table class="orders-table">
+            <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Change Status</th>
+
+<!--
+-->
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}">
+                <td class="order-id" th:text="${order.id}"></td>
+                <td class="customer-name" th:text="${order.customer.name}"></td>
+                <td
+                        class="order-date"
+                        th:text="${#temporals.format(order.createdAt, 'dd-MM-yyyy')}"
+                ></td>
+                <td class="order-total">
+                    ₹<span th:text="${order.totalAmount}"></span>
+                </td>
+                <td th:text="${order.orderStatus}"></td>
+
+
+                <!--                <td>-->
+<!--                <span-->
+<!--                        th:if="${order.orderStatus == 'PENDING'}"-->
+<!--                        class="status-badge status-pending"-->
+<!--                        th:text="${order.orderStatus}"-->
+<!--                ></span>-->
+<!--                    <span-->
+<!--                            th:if="${order.orderStatus == 'PROCESSING'}"-->
+<!--                            class="status-badge status-processing"-->
+<!--                            th:text="${order.orderStatus}"-->
+<!--                    ></span>-->
+<!--                    <span-->
+<!--                            th:if="${order.orderStatus == 'SHIPPED'}"-->
+<!--                            class="status-badge status-shipped"-->
+<!--                            th:text="${order.orderStatus}"-->
+<!--                    ></span>-->
+<!--                    <span-->
+<!--                            th:if="${order.orderStatus == 'DELIVERED'}"-->
+<!--                            class="status-badge status-delivered"-->
+<!--                            th:text="${order.orderStatus}"-->
+<!--                    ></span>-->
+<!--                    <span-->
+<!--                            th:if="${order.orderStatus ==  'CANCELLED'}"-->
+<!--                            class="status-badge status-cancelled"-->
+<!--                            th:text="${order.orderStatus}"-->
+<!--                    ></span>-->
+<!--                </td>-->
+                <td>
+                    <form action="/admin/update-status" method="post">
+                        <input type="hidden" name="orderId" th:value="${order.id}" />
+                        <select
+                                name="status"
+                                class="status-select"
+                                onchange="this.form.submit()"
+                        >
+                            <option value="">Change Status</option>
+                            <option value="PROCESSING">Processing</option>
+                            <option value="SHIPPED">Shipped</option>
+                            <option value="DELIVERED">Delivered</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-bottom">
+        <p>&copy; 2025  KartZo. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Handle alerts
+      const removeAlerts = () => {
+        const alerts = document.querySelectorAll(".alert");
+        if (alerts.length > 0) {
+          setTimeout(function () {
+            alerts.forEach((alert) => {
+              alert.style.display = "none";
+            });
+          }, 2000);
+        }
+      };
+      removeAlerts();
+
+      // Add animation to elements
+      const observeElements = (elements, className) => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add(className);
+              }
+            });
+          },
+          {
+            threshold: 0.1,
+          }
+        );
+        elements.forEach((element) => {
+          observer.observe(element);
+        });
+      };
+
+      // Apply animations if supported
+      if ("IntersectionObserver" in window) {
+        const ordersContainer = document.querySelector(".orders-container");
+
+        if (ordersContainer) {
+          ordersContainer.style.opacity = "0";
+          observeElements([ordersContainer], "animate-fadeInUp");
+        }
+      }
+    });
+</script>
+</body>
+</html>

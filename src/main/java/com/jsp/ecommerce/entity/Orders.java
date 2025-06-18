@@ -33,7 +33,7 @@ public class Orders {
 	private OrderStatus orderStatus;
 
 	@CreationTimestamp
-	private LocalDateTime craetedAt;
+	private LocalDateTime createdAt;
 
 	@ManyToOne
 	private Customer customer;

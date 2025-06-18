@@ -21,7 +21,7 @@ Tools: Maven, Git, GitHub, Eclipse IDE, VS Code
 
 📁 Folder Structure
 
-├── src/
+├── src
 │   ├── main/java/...  # Spring Boot backend code
 │   └── main/resources/
 ├── frontend/          # HTML/CSS/JS for UI

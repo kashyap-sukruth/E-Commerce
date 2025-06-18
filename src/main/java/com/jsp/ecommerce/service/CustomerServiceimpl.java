@@ -126,7 +126,7 @@ public class CustomerServiceimpl implements CustomerService {
 	@Override
 	public String viewProducts(HttpSession session, Model model, String sort, String search, String category) {
 		Customer customer = (Customer) session.getAttribute("customer");
-		if (customer != null ) {
+		if (customer != null) {
 			List<Product> products = null;
 
 			if (category == null && search == null && sort == null)
@@ -144,16 +144,25 @@ public class CustomerServiceimpl implements CustomerService {
 				}
 			}
 			if (category != null) {
-				products = productRepository.findByStatusAndCategory(Status.APPROVED, category,
+				products = productRepository.findByStatusAndCategoryAndStockGreaterThan(Status.APPROVED, category,0,
 						Sort.by("name").ascending());
 			}
+
 			if (search != null) {
 				products = productRepository.findByStatusAndNameLike(Status.APPROVED, "%" + search + "%",
 						Sort.by("name").ascending());
 			}
+//			if (allCat != null) {
+//				products = productRepository.findByStatus(Status.APPROVED,Sort.by("name").ascending());
+//			}
+
+			if (category == null || category.equals("AllCat")) {
+				products = productRepository.findByStatus(Status.APPROVED, Sort.by("name").ascending());
+			}
+
 			if (products.isEmpty()) {
 				session.setAttribute("fail", "No Products Added Yet");
-				return "redirect:/customer/home";
+				return "redirect:/customer/products ";
 			} else {
 				model.addAttribute("products", products);
 				return "viewApprovedProducts.html";
@@ -306,8 +315,7 @@ public class CustomerServiceimpl implements CustomerService {
 			if (customer.getAddress() == null || customer.getMobile() == null) {
 				session.setAttribute("fail", "First add Address and Mobile Number in manage profile");
 				return "redirect:/customer/manage-profile";
-			}
-			else {
+			} else {
 				Cart cart = cartRepository.findByCustomer(customer);
 				if (cart == null) {
 					session.setAttribute("fail", "No Items in Cart");
@@ -324,7 +332,7 @@ public class CustomerServiceimpl implements CustomerService {
 
 						Orders order = new Orders();
 						order.setCustomer(customer);
-						order.setOrderStatus(OrderStatus.PLACED);
+						order.setOrderStatus(OrderStatus.PROCESSING);
 						order.setPaymentStatus(PaymentStatus.PENDING);
 						order.setTotalAmount(amount);
 						order.setAddress(customer.getAddress());
@@ -355,8 +363,11 @@ public class CustomerServiceimpl implements CustomerService {
 			Orders order = orderRepository.findById(id).orElseThrow();
 			if (paymentId != null)
 				order.setPaymentStatus(PaymentStatus.PAID);
+
 			else
-				order.setPaymentStatus(PaymentStatus.FAILED);
+                order.setPaymentStatus(PaymentStatus.FAILED);
+//                order.setOrderStatus(OrderStatus.PROCESSING);
+
 
 			orderRepository.save(order);
 			Payment payment = new Payment();
@@ -387,23 +398,23 @@ public class CustomerServiceimpl implements CustomerService {
 
 	@Override
 	public String manageProfile(HttpSession session, Model model) {
-        Customer customer = (Customer) session.getAttribute("customer");
-        if (customer != null) {
-            model.addAttribute("name", customer.getName());
-            model.addAttribute("address", customer.getAddress());
-            model.addAttribute("mobile", customer.getMobile());
-            return "customer-manage-profile";
-        } else {
-            session.setAttribute("fail", "Invalid Session, First Login to Access");
-            return "redirect:/login";
-        }
+		Customer customer = (Customer) session.getAttribute("customer");
+		if (customer != null) {
+			model.addAttribute("name", customer.getName());
+			model.addAttribute("address", customer.getAddress());
+			model.addAttribute("mobile", customer.getMobile());
+			return "customer-manage-profile";
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
 	}
 
 	@Override
 	public String manageProfile(HttpSession session, UserDto dto, Long mobile, String address) {
 		Customer customer = (Customer) session.getAttribute("customer");
 		if (customer != null) {
-			if (dto.getPassword().length()>0 && !dto.getPassword().matches("^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$")) {
+			if (dto.getPassword().length() > 0 && !dto.getPassword().matches("^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$")) {
 				session.setAttribute("fail",
 						"Password is Not Strong Enough Should be 8 char with one upper , lower , special char and digit");
 				return "redirect:/customer/manage-profile";
@@ -411,7 +422,7 @@ public class CustomerServiceimpl implements CustomerService {
 				customer.setMobile(mobile);
 				customer.setAddress(address);
 				customer.setName(dto.getName());
-				if(dto.getPassword().length()>0)
+				if (dto.getPassword().length() > 0)
 					customer.setPassword(AES.encrypt(dto.getPassword()));
 				customerRepository.save(customer);
 				session.setAttribute("pass", "Profile Updated Success");
@@ -422,7 +433,60 @@ public class CustomerServiceimpl implements CustomerService {
 			return "redirect:/login";
 		}
 	}
+
+	@Override
+	public String orderHistory(HttpSession session, Model model) {
+		Customer customer = (Customer) session.getAttribute("customer");
+		if (customer != null) {
+			List<Orders> orders = orderRepository.findByCustomer(customer);
+			if (orders.isEmpty()) {
+				session.setAttribute("fail", "No Orders Yet");
+				return "redirect:/customer/home";
+			} else {
+				model.addAttribute("orders", orders);
+				return "order-history.html";
+			}
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+	}
+
+	@Override
+	public String loadTrackOrder(HttpSession session) {
+		Customer customer = (Customer) session.getAttribute("customer");
+		if (customer != null) {
+			return "track-order.html";
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+	}
+
+	@Override
+	public String trackOrders(Long orderId, HttpSession session, Model model) {
+		Customer customer = (Customer) session.getAttribute("customer");
+		if (customer != null) {
+			System.out.println("Order Id : " + orderId);
+			Orders order = orderRepository.findById(orderId).orElse(null);
+			if (order == null) {
+				session.setAttribute("fail", "Invalid Order Id");
+				return "redirect:/customer/track-orders";
+			}
+			if (order.getCustomer().getId() == customer.getId()) {
+				model.addAttribute("order", order);
+				return "track-order.html";
+			} else {
+				session.setAttribute("fail", "Invalid Order Id");
+				return "redirect:/customer/track-orders";
+			}
+		} else {
+			session.setAttribute("fail", "Invalid Session, First Login to Access");
+			return "redirect:/login";
+		}
+	}
 }
+
 
 
 

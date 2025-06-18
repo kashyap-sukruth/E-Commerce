@@ -604,7 +604,7 @@
         <p>Join our community and start shopping</p>
         <span class="customer-badge"><i class="fas fa-user"></i> Customer Account</span>
       </div>
-      
+
       <form action="/customer/register" method="post" th:object="${userDto}">
         <div class="form-group">
           <label for="name">Full Name</label>
@@ -614,7 +614,7 @@
             <span class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
           </div>
         </div>
-        
+
         <div class="form-group">
           <label for="email">Email Address</label>
           <div class="input-with-icon">
@@ -623,7 +623,7 @@
             <span class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
           </div>
         </div>
-        
+
         <div class="form-group">
           <label for="password">Password</label>
           <div class="input-with-icon">
@@ -632,7 +632,7 @@
             <span class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
           </div>
         </div>
-        
+
         <div class="form-group">
           <label for="confirmPassword">Confirm Password</label>
           <div class="input-with-icon">
@@ -641,22 +641,22 @@
             <span class="error-message" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
           </div>
         </div>
-        
+
         <div class="checkbox-group">
           <input type="checkbox" id="terms" name="terms" th:field="*{terms}" value="true" />
           <label for="terms">I agree to the <a href="/terms">Terms and Conditions</a> and <a href="/privacy">Privacy Policy</a></label>
           <span class="error-message" th:if="${#fields.hasErrors('terms')}" th:errors="*{terms}"></span>
         </div>
-        
+
         <button type="submit" class="submit-button">
           <i class="fas fa-user-plus"></i> Create Account
         </button>
-        
+
         <div class="login-link">
           Already have an account? <a href="/login">Login here</a>
         </div>
-    
-        
+
+
         <div class="features-section">
           <h3>Why Shop with Us?</h3>
           <div class="features-list">
@@ -693,7 +693,7 @@
       // Script to automatically remove alerts after 2 seconds
       document.addEventListener('DOMContentLoaded', function() {
         const alerts = document.querySelectorAll('.alert');
-        
+
         if (alerts.length > 0) {
           setTimeout(function() {
             alerts.forEach(alert => {
@@ -701,10 +701,10 @@
             });
           }, 2000);
         }
-        
+
         // Password visibility toggle for both password fields
         const passwordFields = document.querySelectorAll('input[type="password"]');
-        
+
         passwordFields.forEach(field => {
           const togglePassword = document.createElement('i');
           togglePassword.className = 'fas fa-eye';
@@ -714,9 +714,9 @@
           togglePassword.style.transform = 'translateY(-50%)';
           togglePassword.style.cursor = 'pointer';
           togglePassword.style.color = 'var(--gray)';
-          
+
           field.parentElement.appendChild(togglePassword);
-          
+
           togglePassword.addEventListener('click', function() {
             if (field.type === 'password') {
               field.type = 'text';
@@ -727,7 +727,7 @@
             }
           });
         });
-        
+
         // Password strength indicator
         const passwordInput = document.getElementById('password');
         if (passwordInput) {
@@ -736,18 +736,18 @@
           strengthIndicator.style.marginTop = '8px';
           strengthIndicator.style.borderRadius = '2px';
           strengthIndicator.style.transition = 'all 0.3s ease';
-          
+
           passwordInput.parentElement.appendChild(strengthIndicator);
-          
+
           passwordInput.addEventListener('input', function() {
             const value = passwordInput.value;
             let strength = 0;
-            
+
             if (value.length >= 8) strength += 1;
             if (value.match(/[A-Z]/)) strength += 1;
             if (value.match(/[0-9]/)) strength += 1;
             if (value.match(/[^A-Za-z0-9]/)) strength += 1;
-            
+
             switch (strength) {
               case 0:
                 strengthIndicator.style.width = '0%';
@@ -772,7 +772,7 @@
             }
           });
         }
-        
+
         // Password match validation
         const confirmPasswordInput = document.getElementById('confirmPassword');
         if (confirmPasswordInput && passwordInput) {
@@ -780,15 +780,15 @@
           matchIndicator.style.fontSize = '0.85rem';
           matchIndicator.style.marginTop = '5px';
           matchIndicator.style.display = 'none';
-          
+
           confirmPasswordInput.parentElement.appendChild(matchIndicator);
-          
+
           function checkPasswordMatch() {
             if (confirmPasswordInput.value === '') {
               matchIndicator.style.display = 'none';
               return;
             }
-            
+
             if (passwordInput.value === confirmPasswordInput.value) {
               matchIndicator.style.display = 'block';
               matchIndicator.style.color = 'var(--success)';
@@ -799,7 +799,7 @@
               matchIndicator.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match';
             }
           }
-          
+
           confirmPasswordInput.addEventListener('input', checkPasswordMatch);
           passwordInput.addEventListener('input', function() {
             if (confirmPasswordInput.value !== '') {
@@ -807,14 +807,14 @@
             }
           });
         }
-        
+
         // Animate feature items on hover
         const featureItems = document.querySelectorAll('.feature-item');
         featureItems.forEach(item => {
           item.addEventListener('mouseenter', function() {
             this.style.backgroundColor = '#e8f4fd';
           });
-          
+
           item.addEventListener('mouseleave', function() {
             this.style.backgroundColor = '#f8f9fa';
           });

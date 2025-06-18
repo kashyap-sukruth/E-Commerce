@@ -6,11 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import com.jsp.ecommerce.dto.ProductDto;
 import com.jsp.ecommerce.dto.UserDto;
@@ -41,7 +37,7 @@ public class MerchantController {
 	}
 
 	@PostMapping("/otp")
-	public String submitOtp(@RequestParam("otp") int otp, HttpSession session) {
+	public String submitOtp(@ModelAttribute("otp") int otp, HttpSession session) {
 		return merchantService.sumbitOtp(otp, session);
 	}
 
@@ -79,5 +75,17 @@ public class MerchantController {
 	@GetMapping("/delete/{id}")
 	public String deleteProduct(@PathVariable("id") Long id, HttpSession session) {
 		return merchantService.deleteById(id, session);
+	}
+
+	@GetMapping("/manage-profile")
+	public String manageProfile(HttpSession session,Model model)
+	{
+		return  merchantService.manageProfile(session,model);
+	}
+
+	@PostMapping("/manage-profile")
+	public String manageProfile(HttpSession session, @ModelAttribute UserDto dto,
+								@RequestParam("mobile") String mobile) {
+		return merchantService.manageProfile(session, dto, mobile);
 	}
 }
